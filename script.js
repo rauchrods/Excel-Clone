@@ -62,7 +62,7 @@ for(let row = 0; row< 150; row++) {
         let td = document.createElement("td");
         td.setAttribute("contenteditable", true);
         td.setAttribute("onfocus", "getcurrentcell(event)");
-        td.setAttribute("spellcheck", true);
+        td.setAttribute("spellcheck", false);
         td.setAttribute("id", `${String.fromCharCode(col+65)}${row+1}`);
         tr.appendChild(td);
      }
