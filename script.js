@@ -79,9 +79,11 @@ let array_of_matrixdata = [];
 (() => {
 
     array_of_matrixdata = JSON.parse(localStorage.getItem('array_of_matrixdata')) || [];
-     
+    if (array_of_matrixdata.length > 0) {
+        printExcelSheet(array_of_matrixdata[0]);
+    }
     let n = array_of_matrixdata.length;
-    for (let i = 0; i < n-1; i++) {
+    for (let i = 0; i < n - 1; i++) {
 
         let sheetdiv = document.querySelector(".sheet-add");
         let sheettab = document.createElement("span");
@@ -121,7 +123,7 @@ function makeMatrixdata() {
     console.log(array_of_matrixdata);
 }
 
-if(array_of_matrixdata.length===0){
+if (array_of_matrixdata.length === 0) {
     makeMatrixdata();
     // printExcelSheet(array_of_matrixdata[0]);
 }
