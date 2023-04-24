@@ -127,3 +127,6 @@ td:focus{
     background-color: lightgray;
     border-bottom: 2px solid rgb(16,124,65);
 }
+.sheet-add>.active-sheet{
+    border-bottom: 2px solid rgb(16,124,65);
+}

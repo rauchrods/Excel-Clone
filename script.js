@@ -33,7 +33,7 @@ let downloadbtn = document.querySelector("#download-btn");
 
 let addsheetbtn = document.querySelector("#add-sheet-btn");
 let sheet_no = 2;
-
+let currentsheetno = 1;
 let cutobj = {};
 
 let tr = document.createElement("tr");
@@ -75,14 +75,57 @@ for (let row = 0; row < 100; row++) {
 }
 
 // making matrix data to store all the information of every cell
-let matrixdata = new Array(100);
+let array_of_matrixdata = [];
+(() => {
 
-for (let i = 0; i < 100; i++) {
-    matrixdata[i] = new Array(26);
-    for (let j = 0; j < 26; j++) {
-        matrixdata[i][j] = {};
+    array_of_matrixdata = JSON.parse(localStorage.getItem('array_of_matrixdata')) || [];
+     
+    let n = array_of_matrixdata.length;
+    for (let i = 0; i < n-1; i++) {
+
+        let sheetdiv = document.querySelector(".sheet-add");
+        let sheettab = document.createElement("span");
+        sheettab.innerText = `Sheet ${sheet_no}`;
+        sheet_no++;
+        sheetdiv.insertBefore(sheettab, sheetdiv.lastElementChild);
+
+        document.querySelectorAll(".sheet-add>span:not(#add-sheet-btn)").forEach(function (sheet) {
+            sheet.addEventListener("click", (event) => {
+                // console.log(event.target);
+                document.querySelectorAll(".sheet-add>span:not(#add-sheet-btn)").forEach(function (sh) {
+                    sh.classList.remove("active-sheet");
+                });
+                event.target.setAttribute("class", "active-sheet");
+                currentsheetno = Number(event.target.innerText.split(" ")[1]);
+                console.log("currentsheetno", currentsheetno);
+                printExcelSheet(array_of_matrixdata[currentsheetno - 1]);
+            })
+        });
+
     }
+
+})();
+
+function makeMatrixdata() {
+    let matrixdata = new Array(100);
+
+    for (let i = 0; i < 100; i++) {
+        matrixdata[i] = new Array(26);
+        for (let j = 0; j < 26; j++) {
+            matrixdata[i][j] = {};
+        }
+    }
+
+    array_of_matrixdata.push(matrixdata);
+    localStorage.setItem("array_of_matrixdata", JSON.stringify(array_of_matrixdata));
+    console.log(array_of_matrixdata);
 }
+
+if(array_of_matrixdata.length===0){
+    makeMatrixdata();
+    // printExcelSheet(array_of_matrixdata[0]);
+}
+
 
 // console.log(matrixdata);
 
@@ -96,9 +139,12 @@ function updateJSON(cell) {
     let row = Number(cell.id.substring(1)) - 1;
     let column = cell.id.charCodeAt(0) - 65;
     //  console.log(row, column);
-    matrixdata[row][column] = obj;
+    array_of_matrixdata[currentsheetno - 1][row][column] = obj;
 
-    console.log(matrixdata);
+    localStorage.setItem("array_of_matrixdata", JSON.stringify(array_of_matrixdata));
+
+
+    console.log(array_of_matrixdata);
 }
 
 let currele;
@@ -287,6 +333,21 @@ addsheetbtn.addEventListener("click", () => {
     sheettab.innerText = `Sheet ${sheet_no}`;
     sheet_no++;
     sheetdiv.insertBefore(sheettab, sheetdiv.lastElementChild);
+
+    document.querySelectorAll(".sheet-add>span:not(#add-sheet-btn)").forEach(function (sheet) {
+        sheet.addEventListener("click", (event) => {
+            // console.log(event.target);
+            document.querySelectorAll(".sheet-add>span:not(#add-sheet-btn)").forEach(function (sh) {
+                sh.classList.remove("active-sheet");
+            });
+            event.target.setAttribute("class", "active-sheet");
+            currentsheetno = Number(event.target.innerText.split(" ")[1]);
+            console.log("currentsheetno", currentsheetno);
+            printExcelSheet(array_of_matrixdata[currentsheetno - 1]);
+        })
+    });
+
+    makeMatrixdata();
 });
 
 
@@ -307,7 +368,7 @@ function downloadJSON() {
     link.click();
     document.body.removeChild(link);
 
-     
+
 }
 
 
@@ -342,16 +403,33 @@ document.querySelector("#upload-btn").addEventListener("change", (event) => {
 
 
 function printExcelSheet(jsondata) {
+    console.log(jsondata);
+    // jsondata.forEach((row) => {
+    //     row.forEach((col) => {
+    //         if (col.id) {
+    //             let cell = document.getElementById(`${col.id}`)
+    //             cell.innerText = col.text;
+    //             cell.style.cssText = col.style;
+    //         }
 
 
-    jsondata.forEach((row) => {
-        row.forEach((col) => {
-            if (col.id) {
-                let cell = document.getElementById(`${col.id}`)
-                cell.innerText = col.text;
-                cell.style.cssText = col.style;
+    //     });
+    // });
+
+    for (let i = 0; i < 100; i++) {
+        for (let j = 0; j < 26; j++) {
+            let cell = document.getElementById(`${String.fromCharCode(j + 65)}${i + 1}`);
+            if (jsondata[i][j].id) {
+                cell.innerText = jsondata[i][j].text;
+                cell.style.cssText = jsondata[i][j].style;
+            }
+            else {
+                cell.innerHTML = "";
+                cell.style.cssText = "";
             }
 
-        });
-    });
+        }
+    }
 }
+
+
